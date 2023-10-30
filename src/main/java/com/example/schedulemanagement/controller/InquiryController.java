@@ -1,18 +1,12 @@
 package com.example.schedulemanagement.controller;
 
 import com.example.schedulemanagement.domain.Scheduler;
-import com.example.schedulemanagement.dto.InquiryRequestDto;
-import com.example.schedulemanagement.service.InquiryService;
-import com.slack.api.methods.SlackApiException;
+import com.example.schedulemanagement.domain.SlackMessageRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.io.IOException;
-import java.time.LocalDateTime;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,15 +14,12 @@ import java.time.LocalDateTime;
 @Slf4j
 public class InquiryController {
 
-    private final InquiryService inquiryService;
     private final Scheduler scheduler;
 
     @PostMapping("/inquiry")
-    public String postInquiry(@RequestBody InquiryRequestDto inquiryRequestDto) throws SlackApiException, IOException {
-        log.info("dto={}", inquiryRequestDto);
-        inquiryRequestDto.setRequestTime(LocalDateTime.now());
-        scheduler.changeCron(inquiryRequestDto);
-//        inquiryService.postInquiry(inquiryRequestDto);
-        return "ok";
+    public String postInquiry(SlackMessageRequest requestInfo) {
+        log.info("dto={}", requestInfo);
+        scheduler.changeCron(requestInfo);
+        return requestInfo.getUser_name() + "님의 요청을 확인하였습니다.";
     }
 }

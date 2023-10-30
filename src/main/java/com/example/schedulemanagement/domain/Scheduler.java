@@ -1,14 +1,11 @@
 package com.example.schedulemanagement.domain;
 
-import com.example.schedulemanagement.dto.InquiryRequestDto;
 import com.example.schedulemanagement.service.InquiryService;
-import com.example.schedulemanagement.service.SlackBotService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -20,16 +17,15 @@ import java.util.concurrent.ScheduledFuture;
 @EnableScheduling
 public class Scheduler {
     private final InquiryService inquiryService;
-    private final SlackBotService slackBotService;
-    private final TaskScheduler taskScheduler;
+    private final ThreadPoolTaskScheduler taskScheduler;
     private ScheduledFuture<?> future;
     private String cron = "* * * * * *";
 
-    public void changeCron(@RequestBody InquiryRequestDto inquiryRequestDto) {
+    public void changeCron(SlackMessageRequest requestInfo) {
         if (future != null) future.cancel(true);
         this.future = null;
-        this.cron = getCronExpression(inquiryRequestDto.getContent()) + " ?";
-        this.startSchedule(inquiryRequestDto);
+        this.cron = getCronExpression(requestInfo.getText()) + " ?";
+        this.startSchedule(requestInfo);
     }
 
     public String getCronExpression(String content) {
@@ -49,18 +45,11 @@ public class Scheduler {
     }
 
     // 일정 시작 스케줄러
-    public void startSchedule(String content) {
-        ScheduledFuture<?> future = this.taskScheduler.schedule(() -> {
-                    slackBotService.publishMessage(content);
-                },
-                new CronTrigger(cron));
-        this.future = future;
-    }
-
-    public void startSchedule(InquiryRequestDto inquiryRequestDto) {
+    public void startSchedule(SlackMessageRequest requestInfo) {
         ScheduledFuture<?> future = this.taskScheduler.schedule(() -> {
                     try {
-                        inquiryService.postInquiry(inquiryRequestDto);
+                        inquiryService.postInquiry(requestInfo);
+
                     } catch (Exception ex) {
                         return;
                     }

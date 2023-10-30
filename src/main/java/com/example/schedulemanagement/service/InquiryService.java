@@ -1,6 +1,6 @@
 package com.example.schedulemanagement.service;
 
-import com.example.schedulemanagement.dto.InquiryRequestDto;
+import com.example.schedulemanagement.domain.SlackMessageRequest;
 import com.slack.api.Slack;
 import com.slack.api.methods.MethodsClient;
 import com.slack.api.methods.SlackApiException;
@@ -29,23 +29,22 @@ public class InquiryService {
     private String channel;
 
 
-    public void postInquiry(InquiryRequestDto inquiryRequestDto) throws SlackApiException, IOException {
+    public void postInquiry(SlackMessageRequest requestInfo) throws SlackApiException, IOException {
 
         // Slack 메세지 보내기
-        try{
+        try {
             List<TextObject> textObjects = new ArrayList<>();
-            textObjects.add(markdownText("*요청자 :*\n" + inquiryRequestDto.getName()));
-            textObjects.add(markdownText("*요청 시간:*\n" + inquiryRequestDto.getRequestTime()));
-            textObjects.add(markdownText("*요청 내용:*\n" + inquiryRequestDto.getContent()));
+            textObjects.add(markdownText("*요청자 :*\n" + requestInfo.getUser_name()));
+            textObjects.add(markdownText("*요청 내용:*\n" + requestInfo.getText()));
 
             MethodsClient methods = Slack.getInstance().methods(token);
             ChatPostMessageRequest request = ChatPostMessageRequest.builder()
                     .channel(channel)
                     .blocks(asBlocks(
-                            header(header -> header.text(plainText( inquiryRequestDto.getName() + "님의 요청이 호출되었습니다."))),
+                            header(header -> header.text(plainText(requestInfo.getUser_name() + " 님 작업을 처리할 시간입니다!"))),
                             divider(),
                             section(section -> section.fields(textObjects)
-                            ))).text(inquiryRequestDto.getContent()).
+                            ))).
                     build();
             methods.chatPostMessage(request);
         } catch (SlackApiException | IOException e) {
