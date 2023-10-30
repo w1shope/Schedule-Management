@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,6 +26,7 @@ public class InquiryController {
     @PostMapping("/inquiry")
     public String postInquiry(@RequestBody InquiryRequestDto inquiryRequestDto) throws SlackApiException, IOException {
         log.info("dto={}", inquiryRequestDto);
+        inquiryRequestDto.setRequestTime(LocalDateTime.now());
         scheduler.changeCron(inquiryRequestDto);
 //        inquiryService.postInquiry(inquiryRequestDto);
         return "ok";

@@ -33,12 +33,11 @@ public class Scheduler {
     }
 
     public String getCronExpression(String content) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MM월 dd일 HH시 mm분에 알림");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MM월 dd일 HH시 mm분");
         Date date;
         try {
             // parse() : 문자열 -> 객체
             date = dateFormat.parse(content);
-
             // 파싱한 날짜를 기반으로 cron 표현식 생성
             dateFormat = new SimpleDateFormat("ss mm HH dd MM");
             String format = dateFormat.format(date);

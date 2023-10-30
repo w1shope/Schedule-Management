@@ -45,9 +45,8 @@ public class InquiryService {
                             header(header -> header.text(plainText( inquiryRequestDto.getName() + "님의 요청이 호출되었습니다."))),
                             divider(),
                             section(section -> section.fields(textObjects)
-                            ))).
+                            ))).text(inquiryRequestDto.getContent()).
                     build();
-
             methods.chatPostMessage(request);
         } catch (SlackApiException | IOException e) {
             throw e;
