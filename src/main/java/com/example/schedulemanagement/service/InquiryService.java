@@ -34,15 +34,15 @@ public class InquiryService {
         // Slack 메세지 보내기
         try{
             List<TextObject> textObjects = new ArrayList<>();
-            textObjects.add(markdownText("*이름:*\n" + inquiryRequestDto.getName()));
-            textObjects.add(markdownText("*문의 제목:*\n" + inquiryRequestDto.getTitle()));
-            textObjects.add(markdownText("*문의내용:*\n" + inquiryRequestDto.getContent()));
+            textObjects.add(markdownText("*요청자 :*\n" + inquiryRequestDto.getName()));
+            textObjects.add(markdownText("*요청 시간:*\n" + inquiryRequestDto.getRequestTime()));
+            textObjects.add(markdownText("*요청 내용:*\n" + inquiryRequestDto.getContent()));
 
             MethodsClient methods = Slack.getInstance().methods(token);
             ChatPostMessageRequest request = ChatPostMessageRequest.builder()
                     .channel(channel)
                     .blocks(asBlocks(
-                            header(header -> header.text(plainText( inquiryRequestDto.getName() + "님이 문의를 남겨주셨습니다!"))),
+                            header(header -> header.text(plainText( inquiryRequestDto.getName() + "님의 요청이 호출되었습니다."))),
                             divider(),
                             section(section -> section.fields(textObjects)
                             ))).
